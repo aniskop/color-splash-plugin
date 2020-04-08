@@ -13,7 +13,15 @@ namespace ColorSplash.PlsqlDeveloperDesign
 
         public static int ValueFromString(string text)
         {
-            return int.Parse(text);
+            if (text == null || string.Empty.Equals(text))
+            {
+                //TODO:  is it a good idea?
+                return 0;
+            }
+            else
+            {
+                return int.Parse(text);
+            }
         }
 
         public override bool IsEmpty()

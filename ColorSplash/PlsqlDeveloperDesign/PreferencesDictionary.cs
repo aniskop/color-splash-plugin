@@ -13,7 +13,13 @@ namespace ColorSplash.PlsqlDeveloperDesign
 
         public string GetPreference(string name)
         {
-            return prefs[name];
+            if (prefs.ContainsKey(name))
+            {
+                return prefs[name];
+            } else
+            {
+                return string.Empty;
+            }
         }
 
         public IntPreference GetPreferenceInt(string name)

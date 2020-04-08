@@ -278,10 +278,20 @@ namespace ColorSplash
         {
             chkEditorBold.Checked = theme.Editor.FontEffect.Bold.Value;
             chkEditorItalic.Checked = theme.Editor.FontEffect.Italic.Value;
-            btnEditorColor.BackColor = theme.Editor.FontEffect.FontColor.Value;
+
+            //TODO: correct handle color when it is not in preferences
+            if (theme.Editor.FontEffect.FontColor.Value.IsEmpty)
+            {
+                btnEditorColor.BackColor = Color.White;
+            }
+            else
+            {
+                btnEditorColor.BackColor = theme.Editor.FontEffect.FontColor.Value;
+            }
 
             richSampleCode.Font = new Font(theme.Editor.FontName.Value,
-                                           theme.Editor.FontSize.Value,
+                //TODO: deafult font size
+                                           Math.Max(theme.Editor.FontSize.Value, 10),
                                            GetStyle(chkEditorBold.Checked, chkEditorItalic.Checked));
 
             btnEditorBgColor.BackColor = theme.Editor.FontEffect.BackgroundColor.Value;

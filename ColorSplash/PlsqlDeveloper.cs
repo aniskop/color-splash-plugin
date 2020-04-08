@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using ColorSplash.PlsqlDeveloperDesign;
+using System.Windows.Forms;
 
 namespace ColorSplash
 {
@@ -13,6 +14,7 @@ namespace ColorSplash
         private static PlsqlDeveloper instance;
         private string prefFilePath = null;
         private bool preferencesLoaded = false;
+        private string version = "13";
 
         public static PlsqlDeveloper Instance
         {
@@ -29,8 +31,8 @@ namespace ColorSplash
         private PlsqlDeveloper()
         {
             Preferences = new PreferencesDictionary();
-            prefFilePath = GetPreferencesFilePath();
-            LoadPreferences();
+            prefFilePath = GetUserPreferencesFilePath();
+            //LoadPreferences();
         }
 
         public PreferencesDictionary Preferences
@@ -86,34 +88,54 @@ namespace ColorSplash
         public void LoadPreferences()
         {
             Preferences.Clear();
-            StreamReader r = new StreamReader(prefFilePath);
-            string line = null;
-            string[] prop;
-            char[] delim = { '=' };
-
-            while ((line = r.ReadLine()) != null)
+            LoadPreferencesFromFile(GetDefaultPreferencesFilePath());
+            LoadPreferencesFromFile(GetUserPreferencesFilePath());
+        }
+        private void LoadPreferencesFromFile(string filePath)
+        {
+            if (File.Exists(prefFilePath))
             {
-                if (Preference.ContainsHighlightPreference(line))
+                StreamReader r = new StreamReader(prefFilePath);
+                string line = null;
+                string[] prop;
+                char[] delim = { '=' };
+
+                while ((line = r.ReadLine()) != null)
                 {
-                    prop = line.Split(delim);
-                    Preferences.SetPreference(prop[0], prop[1]);
+                    if (Preference.ContainsHighlightPreference(line))
+                    {
+                        prop = line.Split(delim);
+                        Preferences.SetPreference(prop[0], prop[1]);
+                    }
                 }
+
+                r.Close();
+
+                preferencesLoaded = true;
             }
-
-            r.Close();
-
-            preferencesLoaded = true;
+            else
+            {
+                MessageBox.Show("Could not find preferences file \"" + prefFilePath + "\".", "Preferences not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
-        private string GetPreferencesFilePath()
+        private string GetUserPreferencesFilePath()
         {
-            if (IsWindows7())
-            {
-                return String.Format("{0}\\PLSQL Developer\\Preferences\\{1}\\default.ini",
-                                     System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                                     System.Environment.UserName);
-            }
-            return null;
+            /*if (IsWindows7())
+            {*/
+            return String.Format("{0}\\PLSQL Developer {1}\\Preferences\\{2}\\default.ini",
+                                 System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                                 version,
+                                 System.Environment.UserName);
+            //}
+            //return null;
+        }
+
+        private string GetDefaultPreferencesFilePath()
+        {
+            //TODO: use pl/sql dev home dir
+            //TODO: also program files folder depends on 32/64 bit
+            return String.Format(@"c:\program files\plsql developer {0}\Preferences\Default.ini", version);
         }
 
         private bool IsWindows7()

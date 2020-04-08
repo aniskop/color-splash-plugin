@@ -1,5 +1,5 @@
 ﻿using ColorSplash.PlsqlDeveloperDesign;
-using System.IO;
+using System.Windows.Forms;
 
 namespace ColorSplash.UITheme
 {
@@ -22,7 +22,6 @@ namespace ColorSplash.UITheme
             InitializeError(t, prefs);
             t.HighlightColor = prefs.GetPreferenceColor(Preference.HIGHLIGHT_COLOR);
             t.SearchHitColor = prefs.GetPreferenceColor(Preference.SEARCH_HIT_COLOR);
-
             return t;
         }
 

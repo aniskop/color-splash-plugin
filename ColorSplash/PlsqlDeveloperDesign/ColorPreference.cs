@@ -25,15 +25,30 @@ namespace ColorSplash.PlsqlDeveloperDesign
         /// <param name="text">32-bit integer as string</param>
         public static Color ValueFromString(string text)
         {
-            int val = Convert.ToInt32(text);
-            byte[] bytes = BitConverter.GetBytes(val);
-            if (BitConverter.IsLittleEndian)
+            try
             {
-                return Color.FromArgb(0xff, bytes[0], bytes[1], bytes[2]);
+                if (text == null || string.Empty.Equals(text))
+                {
+                    return Color.Empty;
+                }
+                else
+                {
+                    int val = Convert.ToInt32(text);
+                    byte[] bytes = BitConverter.GetBytes(val);
+                    if (BitConverter.IsLittleEndian)
+                    {
+                        return Color.FromArgb(0xff, bytes[0], bytes[1], bytes[2]);
+                    }
+                    else
+                    {
+                        return Color.FromArgb(0xff, bytes[3], bytes[2], bytes[1]);
+                    }
+                }
             }
-            else
+            catch (Exception e)
             {
-                return Color.FromArgb(0xff, bytes[3], bytes[2], bytes[1]);
+                e.Data.Add("text", text);
+                throw e;
             }
         }
 
