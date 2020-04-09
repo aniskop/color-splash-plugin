@@ -16,11 +16,16 @@ namespace ColorSplash.PlsqlDeveloperDesign
             if (prefs.ContainsKey(name))
             {
                 return prefs[name];
-            } else
+            }
+            else
             {
                 return string.Empty;
             }
         }
+
+        //TODO: the caller may not change pointer to another dictionary
+        public StringDictionary AllPreferences { get { return prefs; } }
+
 
         public IntPreference GetPreferenceInt(string name)
         {

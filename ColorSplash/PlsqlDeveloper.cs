@@ -2,6 +2,7 @@
 using System.IO;
 using ColorSplash.PlsqlDeveloperDesign;
 using System.Windows.Forms;
+using System.Collections;
 
 namespace ColorSplash
 {
@@ -12,7 +13,7 @@ namespace ColorSplash
     {
 
         private static PlsqlDeveloper instance;
-        private string prefFilePath = null;
+        private string userPrefFilePath = null;
         private bool preferencesLoaded = false;
         private string version = "13";
 
@@ -31,7 +32,7 @@ namespace ColorSplash
         private PlsqlDeveloper()
         {
             Preferences = new PreferencesDictionary();
-            prefFilePath = GetUserPreferencesFilePath();
+            userPrefFilePath = GetUserPreferencesFilePath();
             //LoadPreferences();
         }
 
@@ -50,7 +51,7 @@ namespace ColorSplash
             string original = CreateBackupFile();
             //to-do: check if backup created successfully
             StreamReader originalReader = new StreamReader(original);
-            StreamWriter newWriter = new StreamWriter(prefFilePath);
+            StreamWriter newWriter = new StreamWriter(userPrefFilePath);
 
             string line = null;
             string[] prop = null;
@@ -58,17 +59,19 @@ namespace ColorSplash
 
             while ((line = originalReader.ReadLine()) != null)
             {
-                /*
-                 * If line contains setting editable by plugin
-                 * then read value from array and write to file.
-                 * Otherwise write the text from original file.
-                 */
-                if (Preference.ContainsHighlightPreference(line))
+                if ("[Preferences]".Equals(line))
                 {
-                    prop = line.Split(delim);
-                    newWriter.WriteLine(String.Format("{0}={1}", prop[0], Preferences.GetPreference(prop[0])));
+                    // Print all color preferences first.
+                    // Then just skip color settings from original file and write everthing else.
+                    foreach (DictionaryEntry e in Preferences.AllPreferences)
+                    {
+                        newWriter.WriteLine(string.Format("{0}={1}", e.Key.ToString(), e.Value.ToString()));
+                    }
                 }
-                else
+
+                // Just skip color preferences as thy were set before.
+                // And write what has left.
+                if (!Preference.ContainsHighlightPreference(line))
                 {
                     newWriter.WriteLine(line);
                 }
@@ -80,22 +83,22 @@ namespace ColorSplash
 
         private string CreateBackupFile()
         {
-            string backup = prefFilePath + ".bak";
-            File.Copy(prefFilePath, backup, true);
+            string backup = userPrefFilePath + ".bak";
+            File.Copy(userPrefFilePath, backup, true);
             return backup;
         }
 
         public void LoadPreferences()
         {
             Preferences.Clear();
-            LoadPreferencesFromFile(GetDefaultPreferencesFilePath());
+            LoadPreferencesFromFile(GetSystemDefaultPreferencesFilePath());
             LoadPreferencesFromFile(GetUserPreferencesFilePath());
         }
         private void LoadPreferencesFromFile(string filePath)
         {
-            if (File.Exists(prefFilePath))
+            if (File.Exists(filePath))
             {
-                StreamReader r = new StreamReader(prefFilePath);
+                StreamReader r = new StreamReader(filePath);
                 string line = null;
                 string[] prop;
                 char[] delim = { '=' };
@@ -115,7 +118,7 @@ namespace ColorSplash
             }
             else
             {
-                MessageBox.Show("Could not find preferences file \"" + prefFilePath + "\".", "Preferences not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Could not find preferences file \"" + userPrefFilePath + "\".", "Preferences not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -131,11 +134,11 @@ namespace ColorSplash
             //return null;
         }
 
-        private string GetDefaultPreferencesFilePath()
+        private string GetSystemDefaultPreferencesFilePath()
         {
             //TODO: use pl/sql dev home dir
             //TODO: also program files folder depends on 32/64 bit
-            return String.Format(@"c:\program files\plsql developer {0}\Preferences\Default.ini", version);
+            return string.Format(@"c:\program files\plsql developer {0}\Preferences\Default.ini", version);
         }
 
         private bool IsWindows7()
