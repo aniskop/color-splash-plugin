@@ -156,5 +156,19 @@ namespace ColorSplash
             return false;
         }
 
+        public string GetPersonalPrefSets()
+        {
+            return PlsqlDeveloperCallbacks.IdeGetPersonalPrefSets();
+        }
+
+        public string IdeGetPrefAsString(int pluginId, string prefSet, string name, string defaultValue)
+        {
+            return PlsqlDeveloperCallbacks.IdeGetPrefAsString(pluginId, prefSet, name, defaultValue);
+        }
+
+        public string IdeGetGeneralPref(string name)
+        {
+            return PlsqlDeveloperCallbacks.IdeGetGeneralPref(name);
+        }
     }
 }

@@ -499,12 +499,17 @@ namespace ColorSplash
 
         private void btnSaveAs_Click(object sender, EventArgs e)
         {
-            saveDialog.Filter = "All files (*.*)|*.*";
+            //TODO: 'debug
+            ThemeSaver s = new ThemeSaver(ColorSplashPlugin.CurrentTheme);
+            s.Save();
+            return;
+
+            /*saveDialog.Filter = "All files (*.*)|*.*";
             saveDialog.ShowDialog();
             if (!"".Equals(saveDialog.FileName))
             {
                 ThemeWriter.SaveToFile(ColorSplashPlugin.CurrentTheme, saveDialog.FileName);
-            }
+            }*/
         }
 
         private void SetThemeAndPreference(ColorPreference p, Color val)
